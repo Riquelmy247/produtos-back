@@ -1,5 +1,6 @@
 package com.produto.controller;
 
+import com.produto.config.ProdutoException;
 import com.produto.model.DTO.LoginRequestDTO;
 import com.produto.model.DTO.UsuarioDTO;
 import com.produto.service.UsuarioService;
@@ -22,6 +23,9 @@ public class UsuarioController {
         try {
             UsuarioDTO usuarioCadastrado = usuarioService.cadastrarUsuario(usuarioDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCadastrado);
+        } catch (ProdutoException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erro ao cadastrar usuário: " + e.getMessage());

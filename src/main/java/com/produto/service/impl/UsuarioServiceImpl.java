@@ -1,5 +1,6 @@
 package com.produto.service.impl;
 
+import com.produto.config.ProdutoException;
 import com.produto.model.DTO.LoginRequestDTO;
 import com.produto.model.DTO.UsuarioDTO;
 import com.produto.model.Usuario;
@@ -19,17 +20,22 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @Override
     public UsuarioDTO cadastrarUsuario(UsuarioDTO usuarioDTO) {
         try {
+            if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
+                throw new ProdutoException("Email já cadastrado.");
+            }
+
             Usuario usuario = new Usuario();
             usuario.setNome(usuarioDTO.getNome());
             usuario.setEmail(usuarioDTO.getEmail());
             usuario.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
             usuario = usuarioRepository.save(usuario);
             return convertToDTO(usuario);
+        } catch (ProdutoException e) {
+            throw new ProdutoException(e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Erro ao cadastrar usuário: " + e.getMessage());
         }
     }
 

@@ -25,7 +25,9 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     public ProdutoDTO cadastrarProduto(ProdutoDTO produtoDTO) {
         try {
+            Long id = produtoRepository.findNextId();
             Produto produto = new Produto();
+            produto.setId(id);
             produto.setNome(produtoDTO.getNome());
             produto.setPreco(produtoDTO.getPreco());
             produto.setDescricao(produtoDTO.getDescricao());
@@ -81,15 +83,45 @@ public class ProdutoServiceImpl implements ProdutoService {
 //            Specification<Produto> spec = Specification.where(ProdutoFilter.nomeContains(filter.getNome()))
 //                    .and(ProdutoFilter.categoriaEquals(filter.getCategoria()))
 //                    .and(ProdutoFilter.descricaoContains(filter.getDescricao()))
+//                    .and(ProdutoFilter.quantidadeEquals(filter.getQuantidade()))
 //                    .and(ProdutoFilter.precoGreaterThanOrEqual(filter.getPrecoMin()))
 //                    .and(ProdutoFilter.precoLessThanOrEqual(filter.getPrecoMax()));
 //
-//            List<Produto> produtos = produtoRepository.findAll(
-//                    spec,
-//                    filter.isOrdenarPrecoAsc() ? Sort.by("preco").ascending() : Sort.by("preco").descending()
-//            );
+//            Sort sort = Sort.unsorted();
 //
+//            if (filter.getOrdenarPreco() == 1) {
+//                sort = Sort.by("preco").ascending();
+//            } else if (filter.getOrdenarPreco() == 2) {
+//                sort = Sort.by("preco").descending();
+//            }
+//
+//            if (sort.isUnsorted()) {
+//                if (filter.getOrdenarQuantidade() == 1) {
+//                    sort = Sort.by("quantidade").ascending();
+//                } else if (filter.getOrdenarQuantidade() == 2) {
+//                    sort = Sort.by("quantidade").descending();
+//                }
+//            }
+//
+//            if (sort.isUnsorted()) {
+//                if (filter.getOrdenarNome() == 1) {
+//                    sort = Sort.by("nome").ascending();
+//                } else if (filter.getOrdenarNome() == 2) {
+//                    sort = Sort.by("nome").descending();
+//                }
+//            }
+//
+//            if (sort.isUnsorted()) {
+//                if (filter.getOrdenarCategoria() == 1) {
+//                    sort = Sort.by("categoria").ascending();
+//                } else if (filter.getOrdenarCategoria() == 2) {
+//                    sort = Sort.by("categoria").descending();
+//                }
+//            }
+//
+//            List<Produto> produtos = produtoRepository.findAll(spec, sort);
 //            return produtos.stream().map(this::convertToDTO).collect(Collectors.toList());
+//
 //        } catch (DataAccessException e) {
 //            throw new RuntimeException("Erro ao buscar produtos com filtros: " + e.getMessage(), e);
 //        }
@@ -98,7 +130,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     public List<ProdutoDTO> buscarComFiltros(ProdutoFilter filter) {
         try {
-            // Criando a Specification com os filtros
+            // Criando a especificação de filtros
             Specification<Produto> spec = Specification.where(ProdutoFilter.nomeContains(filter.getNome()))
                     .and(ProdutoFilter.categoriaEquals(filter.getCategoria()))
                     .and(ProdutoFilter.descricaoContains(filter.getDescricao()))
@@ -106,30 +138,35 @@ public class ProdutoServiceImpl implements ProdutoService {
                     .and(ProdutoFilter.precoGreaterThanOrEqual(filter.getPrecoMin()))
                     .and(ProdutoFilter.precoLessThanOrEqual(filter.getPrecoMax()));
 
-            // Criando a lista de orders que vai ser usada para ordenação
             List<Sort.Order> orders = new ArrayList<>();
 
-            // Ordenação pelo preço
-            if (filter.isOrdenarPrecoAsc()) {
-                orders.add(Sort.Order.asc("preco")); // Preço do menor para o maior
-            } else {
-                orders.add(Sort.Order.desc("preco")); // Preço do maior para o menor
+            if (filter.getOrdenarNome() == 1) {
+                orders.add(Sort.Order.asc("nome"));
+            } else if (filter.getOrdenarNome() == 2) {
+                orders.add(Sort.Order.desc("nome"));
             }
 
-            // Ordenação pela quantidade
-            if (filter.isOrdenarQuantidadeAsc()) {
-                orders.add(Sort.Order.asc("quantidade")); // Quantidade do menor para o maior
-            } else {
-                orders.add(Sort.Order.desc("quantidade")); // Quantidade do maior para o menor
+            if (filter.getOrdenarCategoria() == 1) {
+                orders.add(Sort.Order.asc("categoria"));
+            } else if (filter.getOrdenarCategoria() == 2) {
+                orders.add(Sort.Order.desc("categoria"));
             }
 
-            // Criando o objeto Sort a partir da lista de Orders
-            Sort sort = Sort.by(orders);
+            if (filter.getOrdenarQuantidade() == 1) {
+                orders.add(Sort.Order.asc("quantidade"));
+            } else if (filter.getOrdenarQuantidade() == 2) {
+                orders.add(Sort.Order.desc("quantidade"));
+            }
 
-            // Realizando a consulta com a Specification e a ordenação
+            if (filter.getOrdenarPreco() == 1) {
+                orders.add(Sort.Order.asc("preco"));
+            } else if (filter.getOrdenarPreco() == 2) {
+                orders.add(Sort.Order.desc("preco"));
+            }
+
+            Sort sort = orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
             List<Produto> produtos = produtoRepository.findAll(spec, sort);
 
-            // Convertendo os produtos para DTO
             return produtos.stream().map(this::convertToDTO).collect(Collectors.toList());
         } catch (DataAccessException e) {
             throw new RuntimeException("Erro ao buscar produtos com filtros: " + e.getMessage(), e);

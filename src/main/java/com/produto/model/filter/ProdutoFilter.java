@@ -11,8 +11,10 @@ public class ProdutoFilter {
     private Integer quantidade;
     private Double precoMin;
     private Double precoMax;
-    private boolean ordenarPrecoAsc = true;
-    private boolean ordenarQuantidadeAsc = true;
+    private int ordenarPreco;
+    private int ordenarQuantidade;
+    private int ordenarNome;
+    private int ordenarCategoria;
 
     public static Specification<Produto> nomeContains(String nome) {
         return (root, query, builder) -> nome != null ? builder.like(builder.lower(root.get("nome")), "%" + nome.toLowerCase() + "%") : null;
@@ -86,19 +88,35 @@ public class ProdutoFilter {
         this.precoMax = precoMax;
     }
 
-    public boolean isOrdenarPrecoAsc() {
-        return ordenarPrecoAsc;
+    public int getOrdenarPreco() {
+        return ordenarPreco;
     }
 
-    public void setOrdenarPrecoAsc(boolean ordenarPrecoAsc) {
-        this.ordenarPrecoAsc = ordenarPrecoAsc;
+    public void setOrdenarPreco(int ordenarPreco) {
+        this.ordenarPreco = ordenarPreco;
     }
 
-    public boolean isOrdenarQuantidadeAsc() {
-        return ordenarQuantidadeAsc;
+    public int getOrdenarQuantidade() {
+        return ordenarQuantidade;
     }
 
-    public void setOrdenarQuantidadeAsc(boolean ordenarQuantidadeAsc) {
-        this.ordenarQuantidadeAsc = ordenarQuantidadeAsc;
+    public void setOrdenarQuantidade(int ordenarQuantidade) {
+        this.ordenarQuantidade = ordenarQuantidade;
+    }
+
+    public int getOrdenarNome() {
+        return ordenarNome;
+    }
+
+    public void setOrdenarNome(int ordenarNome) {
+        this.ordenarNome = ordenarNome;
+    }
+
+    public int getOrdenarCategoria() {
+        return ordenarCategoria;
+    }
+
+    public void setOrdenarCategoria(int ordenarCategoria) {
+        this.ordenarCategoria = ordenarCategoria;
     }
 }
